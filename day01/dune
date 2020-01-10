@@ -1,5 +1,5 @@
 (executable
  (name day01)
- (libraries base))
+ (libraries base stdio))
 
-(dirs :standard)
+; (dirs :standard)
