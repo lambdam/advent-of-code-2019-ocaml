@@ -1,8 +1,4 @@
+# Advent of code 2019 in OCaml
 
-https://github.com/ocaml-community/utop/issues/306
-
-opam config exec -- dune utop . -- -emacs
-
-https://discuss.ocaml.org/t/configuring-a-project-directory-and-setting-up-the-related-toolchain-opam-dune-etc/2635/3
-
-https://github.com/lindig/hello
+https://adventofcode.com/2019 with OCaml and
+Base (https://opensource.janestreet.com/base/) and Stdio (https://ocaml.janestreet.com/ocaml-core/latest/doc/stdio/)
