@@ -32,32 +32,70 @@ let update_at index value list =
 
 exception No_matching_opcode
 
-let eval_opcode opcode =
+(* How to use this type in calculation? *)
+type instruction =
+  | Add of int * int * int
+  | Mult of int * int * int
+  | Halt
+
+let eval_opcodes opcode =
   let module O = Option in
-  let rec eval_opcode' position opcode =
-    match List.drop opcode position with
+  let rec eval_opcodes' instruction_pointer opcode =
+    match List.drop opcode instruction_pointer with
     | 1 :: pos1 :: pos2 :: at_i :: _ ->
       let x = O.value_exn (List.nth opcode pos1) in
       let y = O.value_exn (List.nth opcode pos2) in
-      eval_opcode' (position + 4) (update_at at_i (x + y) opcode)
+      eval_opcodes' (instruction_pointer + 4) (update_at at_i (x + y) opcode)
     | 2 :: pos1 :: pos2 :: at_i :: _ ->
       let x = O.value_exn (List.nth opcode pos1) in
       let y = O.value_exn (List.nth opcode pos2) in
-      eval_opcode' (position + 4) (update_at at_i (x * y) opcode)
+      eval_opcodes' (instruction_pointer + 4) (update_at at_i (x * y) opcode)
     | 99 :: _ -> opcode
     | _ -> raise No_matching_opcode
   in
-  eval_opcode' 0 opcode
+  eval_opcodes' 0 opcode
 
 let process_opcode () =
   In_channel.read_all input
   |> of_string
   |> update_at 1 12
   |> update_at 2 2
-  |> eval_opcode
+  |> eval_opcodes
   |> to_string
   |> print_string
 
 (*
    process_opcode ()
 *)
+
+let input_program =
+  In_channel.read_all input
+  |> of_string
+
+let target_result = 19690720
+
+let search_inputs () =
+  let rec search_inputs' v1 v2 =
+    match (v1, v2) with
+    | (_, 100) -> search_inputs' (v1 + 1) 0
+    | (100, _) -> None
+    | _ ->
+      input_program
+      |> update_at 1 v1
+      |> update_at 2 v2
+      |> eval_opcodes
+      |> (fun output ->
+          if Option.value_exn (List.nth output 0) = target_result
+          then Some (v1, v2)
+          else search_inputs' v1 (v2 + 1))
+  in
+  search_inputs' 0 0
+
+(*
+   search_inputs ()
+*)
+
+(* let () =
+ *   match search_inputs () with
+ *   | Some (v1, v2) -> print_string (Printf.sprintf "(%d, %d)" v1 v2)
+ *   | None -> print_string "No result" *)
